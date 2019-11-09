@@ -1,0 +1,42 @@
+---
+title: "gapminder_graphic"
+author: "Katie Cao"
+date: "11/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(gapminder)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(gganimate)
+library(gifski)
+library(png)
+
+gapminder %>%
+  filter(country == "Belgium" & year == "1962")
+
+library(gapminder)
+data <- gapminder %>% filter(year=="2007") %>% dplyr::select(-year)
+
+```
+
+```{r bubble, echo=FALSE}
+# Most basic bubble plot
+gapminder %>%
+  arrange(desc(pop)) %>%
+  subset(continent %in% c("Africa","Americas","Asia")) %>%
+  ggplot(aes(x=gdpPercap, y=lifeExp, size=pop, color=continent)) +
+    geom_point(alpha=0.5) +
+    scale_size(range = c(.5, 5), name="Population (M)") +
+  facet_wrap(~ continent) +
+  scale_x_log10(labels = scales::comma) +
+  labs(title = 'Year: {frame_time}', x = 'GDP per capita', y = 'life expectancy') +
+  transition_time(year) +
+  ease_aes('linear')
+
+anim_save("gapminder.gif")
+```
